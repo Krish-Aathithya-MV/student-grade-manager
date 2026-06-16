@@ -1,3 +1,4 @@
+import json
 class Student:
     def __init__(self, name, roll_number):
         self.name = name
@@ -49,6 +50,13 @@ class Student:
         print(f"Grade: {self.get_grade()}")
         print("----------------------\n")
 
+    def to_dict(self):
+        return{
+            "name":self.name,
+            "roll_number":self.roll_number,
+            "marks":self.marks
+        }
+
 
 students = []
 
@@ -58,6 +66,34 @@ def find_student(roll_number):
         if student.roll_number == roll_number:
             return student
     return None
+
+def save_students():
+    data = []
+    for student in students:
+        data.append(student.to_dict())
+
+    with open("students.json","w") as file:
+        json.dump(data, file, indent=4)
+
+def load_students():
+    try:
+        with open("students.json", "r") as file:
+            data = json.load(file)
+
+            for item in data:
+                student = Student(
+                    item["name"],
+                    item["roll_number"]
+                )
+
+                student.marks = item["marks"]
+
+                students.append(student)
+
+    except FileNotFoundError:
+        pass
+
+load_students()
 
 
 print("===== Student Grade Manager =====")
@@ -84,6 +120,7 @@ while True:
         else:
             student = Student(name, roll_number)
             students.append(student)
+            save_students()
             print("Student added successfully!")
 
     elif choice == 2:
@@ -104,6 +141,7 @@ while True:
 
                 if 0 <= mark <= 100:
                     student.marks.append(mark)
+                    save_students()
                     print("Mark added successfully!")
                 else:
                     print("Mark must be between 0 and 100.")
