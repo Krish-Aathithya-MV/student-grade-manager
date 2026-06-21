@@ -19,7 +19,6 @@ A Python-based Student Grade Manager designed to evolve with databases and web t
 - V2: JSON File Storage
 - V3: SQLite Database Integration
 - V4: Web Interface
-- V5: AI Features
 
 ## How to Run
 
