@@ -1,4 +1,5 @@
-import json
+import database
+
 class Student:
     def __init__(self, name, roll_number):
         self.name = name
@@ -50,50 +51,7 @@ class Student:
         print(f"Grade: {self.get_grade()}")
         print("----------------------\n")
 
-    def to_dict(self):
-        return{
-            "name":self.name,
-            "roll_number":self.roll_number,
-            "marks":self.marks
-        }
 
-
-students = []
-
-
-def find_student(roll_number):
-    for student in students:
-        if student.roll_number == roll_number:
-            return student
-    return None
-
-def save_students():
-    data = []
-    for student in students:
-        data.append(student.to_dict())
-
-    with open("students.json","w") as file:
-        json.dump(data, file, indent=4)
-
-def load_students():
-    try:
-        with open("students.json", "r") as file:
-            data = json.load(file)
-
-            for item in data:
-                student = Student(
-                    item["name"],
-                    item["roll_number"]
-                )
-
-                student.marks = item["marks"]
-
-                students.append(student)
-
-    except FileNotFoundError:
-        pass
-
-load_students()
 
 
 print("===== Student Grade Manager =====")
@@ -114,56 +72,87 @@ while True:
     if choice == 1:
         name = input("Enter student's name: ")
         roll_number = input("Enter roll number: ")
-
-        if find_student(roll_number):
+        if database.get_student(roll_number):
             print("Roll number already exists!")
         else:
-            student = Student(name, roll_number)
-            students.append(student)
-            save_students()
+            database.add_student(name, roll_number)
             print("Student added successfully!")
 
     elif choice == 2:
+        students = database.get_all_students()
         if len(students) == 0:
             print("No students found.")
         else:
             print("\nStudents:")
             for student in students:
-                print(f"{student.name} ({student.roll_number})")
+                print(f"{student[0]} ({student[1]})")
 
     elif choice == 3:
         roll_number = input("Enter roll number: ")
-        student = find_student(roll_number)
-
-        if student:
+        if database.get_student(roll_number):
             try:
-                mark = int(input("Enter mark: "))
+                marks_input = input(
+                    "Enter marks separated by commas: "
+                )
+                marks = [
+                    m.strip()
+                    for m in marks_input.split(",")
+                ]
+                added_count = 0
 
-                if 0 <= mark <= 100:
-                    student.marks.append(mark)
-                    save_students()
-                    print("Mark added successfully!")
-                else:
-                    print("Mark must be between 0 and 100.")
+                for mark in marks:
+                    mark = int(mark)
 
+                    if 0 <= mark <= 100:
+                        database.add_mark(
+                            roll_number,
+                            mark
+                        )
+                        added_count += 1
+                    else:
+                        print(
+                            f"{mark} is invalid. "
+                            "Marks must be between 0 and 100."
+                        )
+                if added_count > 0:
+                    print(
+                        f"{added_count} mark(s) added successfully!"
+                    )
             except ValueError:
-                print("Please enter a valid number.")
-
+                print(
+                    "Please enter valid numbers "
+                    "(example: 85,90,76)."
+                )
         else:
             print("Student not found!")
 
     elif choice == 4:
         roll_number = input("Enter roll number: ")
-        student = find_student(roll_number)
+
+        student = database.get_student(roll_number)
 
         if student:
-            student.display_report()
+            name = student[0]
+            roll = student[1]
+            marks_string = student[2]
+
+            temp_student = Student(name, roll)
+
+            if marks_string != "":
+                temp_student.marks = [
+                    int(mark)
+                    for mark in marks_string.split(",")
+                ]
+
+            temp_student.display_report()
+
         else:
             print("Student not found!")
 
     elif choice == 5:
+        database.close_connection()
         print("Goodbye!")
         break
-
     else:
+
         print("Invalid choice. Please enter a number from 1 to 5.")
