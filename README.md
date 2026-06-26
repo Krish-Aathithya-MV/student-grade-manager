@@ -20,10 +20,6 @@ A Python-based Student Grade Manager that demonstrates Object-Oriented Programmi
 - SQLite
 - Git & GitHub
 
-## Project Structure
-
-text Student_Grade_Manager/ ├── main.py          # User interface and application logic ├── database.py      # SQLite database operations ├── students.db      # SQLite database file (not tracked by Git) ├── .gitignore └── README.md 
-
 ## How to Run
 
 1. Clone the repository:
