@@ -1,5 +1,6 @@
 import database
 
+
 class Student:
     def __init__(self, name, roll_number):
         self.name = name
@@ -52,8 +53,6 @@ class Student:
         print("----------------------\n")
 
 
-
-
 print("===== Student Grade Manager =====")
 
 while True:
@@ -69,17 +68,21 @@ while True:
         print("Please enter a number from 1 to 5.")
         continue
 
+
     if choice == 1:
         name = input("Enter student's name: ")
         roll_number = input("Enter roll number: ")
+
         if database.get_student(roll_number):
             print("Roll number already exists!")
         else:
             database.add_student(name, roll_number)
             print("Student added successfully!")
 
+
     elif choice == 2:
         students = database.get_all_students()
+
         if len(students) == 0:
             print("No students found.")
         else:
@@ -87,17 +90,21 @@ while True:
             for student in students:
                 print(f"{student[0]} ({student[1]})")
 
+
     elif choice == 3:
         roll_number = input("Enter roll number: ")
+
         if database.get_student(roll_number):
             try:
                 marks_input = input(
                     "Enter marks separated by commas: "
                 )
+
                 marks = [
                     m.strip()
                     for m in marks_input.split(",")
                 ]
+
                 added_count = 0
 
                 for mark in marks:
@@ -114,10 +121,12 @@ while True:
                             f"{mark} is invalid. "
                             "Marks must be between 0 and 100."
                         )
+
                 if added_count > 0:
                     print(
                         f"{added_count} mark(s) added successfully!"
                     )
+
             except ValueError:
                 print(
                     "Please enter valid numbers "
@@ -126,33 +135,44 @@ while True:
         else:
             print("Student not found!")
 
-    elif choice == 4:
-        roll_number = input("Enter roll number: ")
 
-        student = database.get_student(roll_number)
+    elif choice == 4:
+        roll_number = input(
+            "Enter roll number: "
+        )
+
+        student = database.get_student(
+            roll_number
+        )
 
         if student:
             name = student[0]
             roll = student[1]
-            marks_string = student[2]
 
-            temp_student = Student(name, roll)
+            temp_student = Student(
+                name,
+                roll
+            )
 
-            if marks_string != "":
-                temp_student.marks = [
-                    int(mark)
-                    for mark in marks_string.split(",")
-                ]
+            temp_student.marks = (
+                database.get_marks(
+                    roll_number
+                )
+            )
 
             temp_student.display_report()
 
         else:
             print("Student not found!")
 
+
     elif choice == 5:
         database.close_connection()
         print("Goodbye!")
         break
-    else:
 
-        print("Invalid choice. Please enter a number from 1 to 5.")
+    else:
+        print(
+            "Invalid choice. "
+            "Please enter a number from 1 to 5."
+        )
